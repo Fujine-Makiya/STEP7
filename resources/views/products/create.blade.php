@@ -23,7 +23,7 @@
             <dd class="col-sm-9">
                 <input type="text" name="product_name" class="form-control" value="{{ old('product_name') }}" required>
                 @if ($errors->has('product_name'))
-                    <div class="text-danger">{{ $errors->first('product_name') }}</div>
+                    <p>{{ $errors->first('product_name') }}</p>
                 @endif
             </dd>
 
@@ -37,7 +37,7 @@
                     @endforeach
                 </select>
                 @if ($errors->has('company_id'))
-                    <div class="text-danger">{{ $errors->first('company_id') }}</div>
+                    <p>{{ $errors->first('company_id') }}</p>
                 @endif
             </dd>
 
@@ -45,7 +45,7 @@
             <dd class="col-sm-9">
                 <input type="text" name="price" class="form-control" value="{{ old('price') }}" required>
                 @if ($errors->has('price'))
-                    <div class="text-danger">{{ $errors->first('price') }}</div>
+                    <p>{{ $errors->first('price') }}</p>
                 @endif
             </dd>
 
@@ -53,7 +53,7 @@
             <dd class="col-sm-9">
                 <input type="text" name="stock" class="form-control" value="{{ old('stock') }}" required>
                 @if ($errors->has('stock'))
-                    <div class="text-danger">{{ $errors->first('stock') }}</div>
+                    <p>{{ $errors->first('stock') }}</p>
                 @endif
             </dd>
 
@@ -61,7 +61,7 @@
             <dd class="col-sm-9">
                 <textarea name="comment" class="form-control" rows="3">{{ old('comment') }}</textarea>
                 @if ($errors->has('comment'))
-                    <div class="text-danger">{{ $errors->first('comment') }}</div>
+                    <p>{{ $errors->first('comment') }}</p>
                 @endif
             </dd>
 
@@ -69,7 +69,7 @@
             <dd class="col-sm-9">
                 <input type="file" name="img_path" class="form-control">
                 @if ($errors->has('img_path'))
-                    <div class="text-danger">{{ $errors->first('img_path') }}</div>
+                    <p>{{ $errors->first('img_path') }}</p>
                 @endif
             </dd>
         </dl>

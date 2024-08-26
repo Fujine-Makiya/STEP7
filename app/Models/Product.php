@@ -29,7 +29,7 @@ class Product extends Model
     }
 
     public function index(Request $request)
-{
+    {
     $query = Product::query();
     
     if($search = $request->search){

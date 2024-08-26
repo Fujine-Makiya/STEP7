@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\ArticleRequest;
 
 class ProductController extends Controller {
     /**
@@ -50,46 +51,25 @@ class ProductController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request){
-        $request->validate([
-            'product_name' => 'required', 
-            'company_id' => 'required',
-            'price' => 'required|numeric',
-            'stock' => 'required|numeric',
-            'comment' => 'nullable', 
-            'img_path' => 'nullable|image|max:2048',
-    ], [
-        'product_name.required' => '商品名は必須項目です。',
-        'company_id.required' => 'メーカーを選択してください。',
-        'price.required' => '価格を入力してください。',
-        'price.integer' => '価格は数値で入力してください。',
-        'stock.required' => '在庫数を入力してください。',
-        'stock.integer' => '在庫数は数値で入力してください。',
-    ]);
+    public function store(ArticleRequest $request){
+        $product = new Product();
 
-        $product = new Product([
-            'product_name' => $request->get('product_name'),
-            'company_id' => $request->get('company_id'),
-            'price' => $request->get('price'),
-            'stock' => $request->get('stock'),
-            'comment' => $request->get('comment'),
-        ]);
-
-        if($request->hasFile('img_path')){ 
+        if($request->hasFile('img_pass')){
             $filename = $request->img_path->getClientOriginalName();
             $filePath = $request->img_path->storeAs('products', $filename, 'public');
             $product->img_path = '/storage/' . $filePath;
         }
 
+        $product->fill($request->input());
+
         DB::beginTransaction();
 
         try {
             $product->save();
-
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'An unexpected error occurred.'])->withInput();
+            return back()->withErrors(['error' => '予期しないエラーが発生しました。'])->withInput();
         }
 
         return redirect('products');
@@ -113,49 +93,26 @@ class ProductController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Product $product){
-        $request->validate([
-            'product_name' => 'required',
-            'company_id' => 'required',
-            'price' => 'required|numeric',
-            'stock' => 'required|numeric',
-            'comment' => 'nullable',
-            'img_path' => 'nullable|image|max:2048',
-    ], [
-        'product_name.required' => '商品名は必須項目です。',
-        'company_id.required' => 'メーカーを選択してください。',
-        'price.required' => '価格を入力してください。',
-        'price.numeric' => '価格は数値で入力してください。',
-        'stock.required' => '在庫数を入力してください。',
-        'stock.numeric' => '在庫数は数値で入力してください。',
-    ]);
+        $product->fill($request->input());
 
-    DB::beginTransaction();
-
-    try {    
-        $product->product_name = $request->product_name;
-        $product->company_id = $request->company_id;
-        $product->price = $request->price;
-        $product->stock = $request->stock;
-        $product->comment = $request->comment;
-
-        if($request->hasFile('img_path')){ 
+        if($request->hasFile('img_path')){
             $filename = $request->img_path->getClientOriginalName();
             $filePath = $request->img_path->storeAs('products', $filename, 'public');
             $product->img_path = '/storage/' . $filePath;
         }
+    DB::beginTransaction();
 
+    try {    
         $product->save();
-
         DB::commit();
-
-        return redirect()->route('products.index')
-            ->with('success', 'Product updated successfully');
     } catch (\Exception $e) {
         DB::rollBack();
-        return back()->withErrors(['error' => 'An unexpected error occurred.'])->withInput();
-        }
+        return back()->withErrors(['error' => '予期しないエラーが発生しました。'])->withInput();
     }
 
+    return redirect()->route('products.index')
+        ->with('success', '商品が更新されました');
+}
     public function destroy(Product $product){
         DB::beginTransaction();
 
