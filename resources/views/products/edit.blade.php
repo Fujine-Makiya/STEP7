@@ -4,6 +4,16 @@
 <div class="container">
     <h1 class="mb-4">商品情報編集画面</h1>
 
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as  $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('products.update', $product) }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
@@ -14,7 +24,7 @@
 
             <dt class="col-sm-3">商品名<span class="text-danger">*</span></dt>
             <dd class="col-sm-9">
-                <input type="text" class="form-control" id="product_name" name="product_name" value="{{ old('product_name', $product->product_name) }}" required>
+                <input type="text" class="form-control" id="product_name" name="product_name" value="{{ old('product_name', $product->product_name) }}">
                 @if ($errors->has('product_name'))
                     <p>{{ $errors->first('product_name') }}</p>
                 @endif
@@ -34,7 +44,7 @@
 
             <dt class="col-sm-3">価格<span class="text-danger">*</span></dt>
             <dd class="col-sm-9">
-                <input type="number" class="form-control" id="price" name="price" value="{{ old('price', $product->price) }}" required>
+                <input type="text" class="form-control" id="price" name="price" value="{{ old('price') }}">
                 @if ($errors->has('price'))
                 <p>{{ $errors->first('price') }}</p>
                 @endif
@@ -42,7 +52,7 @@
 
             <dt class="col-sm-3">在庫数<span class="text-danger">*</span></dt>
             <dd class="col-sm-9">
-                <input type="number" class="form-control" id="stock" name="stock" value="{{ old('stock', $product->stock) }}" required>
+                <input type="text" class="form-control" id="stock" name="stock" value="{{ old('stock') }}">
                 @if ($errors->has('stock'))
                 <p>{{ $errors->first('stock') }}</p>
                 @endif

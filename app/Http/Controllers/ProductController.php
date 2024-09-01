@@ -54,7 +54,7 @@ class ProductController extends Controller {
     public function store(ArticleRequest $request){
         $product = new Product();
 
-        if($request->hasFile('img_pass')){
+        if($request->hasFile('img_path')){
             $filename = $request->img_path->getClientOriginalName();
             $filePath = $request->img_path->storeAs('products', $filename, 'public');
             $product->img_path = '/storage/' . $filePath;
@@ -92,7 +92,7 @@ class ProductController extends Controller {
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product){
+    public function update(ArticleRequest $request, Product $product){
         $product->fill($request->input());
 
         if($request->hasFile('img_path')){
@@ -110,8 +110,9 @@ class ProductController extends Controller {
         return back()->withErrors(['error' => '予期しないエラーが発生しました。'])->withInput();
     }
 
-    return redirect()->route('products.index')
-        ->with('success', '商品が更新されました');
+    return redirect()->route('products.edit', $product->id)
+        ->with('success', '商品が更新されました')
+        ->withErrors([]);
 }
     public function destroy(Product $product){
         DB::beginTransaction();

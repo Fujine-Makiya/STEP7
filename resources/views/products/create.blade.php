@@ -21,7 +21,7 @@
         <dl class="row mt-3">
             <dt class="col-sm-3">商品名<span class="text-danger">*</span></dt>
             <dd class="col-sm-9">
-                <input type="text" name="product_name" class="form-control" value="{{ old('product_name') }}" required>
+                <input type="text" name="product_name" class="form-control" value="{{ old('product_name') }}" >
                 @if ($errors->has('product_name'))
                     <p>{{ $errors->first('product_name') }}</p>
                 @endif
@@ -29,7 +29,7 @@
 
             <dt class="col-sm-3">メーカー<span class="text-danger">*</span></dt>
             <dd class="col-sm-9">
-                <select class="form-select" name="company_id" required>
+                <select class="form-select" name="company_id" >
                     @foreach($companies as $company)
                         <option value="{{ $company->id }}" {{ old('company_id') == $company->id ? 'selected' : '' }}>
                             {{ $company->company_name }}
@@ -43,7 +43,7 @@
 
             <dt class="col-sm-3">価格<span class="text-danger">*</span></dt>
             <dd class="col-sm-9">
-                <input type="text" name="price" class="form-control" value="{{ old('price') }}" required>
+                <input type="text" name="price" class="form-control" value="{{ old('price') }}" >
                 @if ($errors->has('price'))
                     <p>{{ $errors->first('price') }}</p>
                 @endif
@@ -51,7 +51,7 @@
 
             <dt class="col-sm-3">在庫数<span class="text-danger">*</span></dt>
             <dd class="col-sm-9">
-                <input type="text" name="stock" class="form-control" value="{{ old('stock') }}" required>
+                <input type="text" name="stock" class="form-control" value="{{ old('stock') }}" >
                 @if ($errors->has('stock'))
                     <p>{{ $errors->first('stock') }}</p>
                 @endif
