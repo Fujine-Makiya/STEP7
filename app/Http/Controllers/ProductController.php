@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Requests\ArticleRequest;
 
 class ProductController extends Controller {
@@ -17,8 +18,18 @@ class ProductController extends Controller {
     public function index(Request $request){
         $search = $request->get('search');
         $companyId = $request->get('company_id');
+        $priceMin = $request->get('price_min');
+        $priceMax = $request->get('price_max');
+        $stockMin = $request->get('stock_min');
+        $stockMax = $request->get('stock_max');
+        $direction  = $request->input('direction', 'desc');
+        $column = $request->input('sort', 'id');
 
-        $query = Product::query();
+        $direction = ($direction === 'desc') ? 'asc' : 'desc';
+
+        $query = Product::join('companies', 'products.company_id', '=', 'companies.id')
+                    ->select('products.*', 'companies.company_name') // company_nameを取得
+                    ->with('company');
     
         if (!empty($search)) {
             $query->where('product_name', 'like', "%{$search}%");
@@ -27,11 +38,39 @@ class ProductController extends Controller {
         if (!empty($companyId)) {
             $query->where('company_id', $companyId);
         }
+
+        if (!empty($priceMin)) {
+            $query->where('price', '>=', $priceMin);
+        }
+
+        if (!empty($priceMax)) {
+            $query->where('price', '<=', $priceMax);
+        }
+
+        if (!empty($stockMin)) {
+            $query->where('stock', '>=', $stockMin);
+        }
+        if (!empty($stockMax)) {
+            $query->where('stock', '<=', $stockMax);
+        }
+
+        if ($column === 'company_name') {
+            $query->orderBy('companies.company_name', $direction);
+        } else {
+            $query->orderBy($column, $direction);
+        }
     
         $products = $query->paginate(10);
         $companies = Company::all();
+       
 
-        return view('products.index', compact('products', 'companies'));
+        return view('products.index', compact('products', 'companies', 'column', 'direction'));
+    }
+
+    public function sorted(Request $request){
+        $direction  = $request->input('direction', 'desc');
+        $column = $request->input('sort', 'id');
+        $products = Product::orderBy($direction, $column)->paginate(10);
     }
 
     /**
@@ -76,7 +115,7 @@ class ProductController extends Controller {
     }
 
     public function show(Product $product){
-        return view('products.show', ['product' => $product]);
+        return view('products.show', compact('product'));
     }
 
     public function edit(Product $product){
@@ -113,21 +152,75 @@ class ProductController extends Controller {
     return redirect()->route('products.edit', $product->id)
         ->with('success', '商品が更新されました')
         ->withErrors([]);
-}
+    }
+
     public function destroy(Product $product){
-        DB::beginTransaction();
+    // try {
+    //     $product->delete();
+    //     return response()->json(['success' => true]);
+    // } catch (\Exception $e) {
+    //     return response()->json([
+    //         'success' => false,
+    //         'message' => '削除に失敗しました: ' . $e->getMessage()
+    //     ], 500);
+    // }
+    try {
+        $product->delete();
 
+        return response()->json([
+            'success' => true,
+            'message' => '商品が削除されました。'
+        ]);
+    } catch (\Exception $e) {
+        Log::error('削除中にエラー発生', ['error' => $e->getMessage()]);
+        return response()->json([
+            'success' => false,
+            'message' => '削除中にエラーが発生しました。',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+    // catch (\Exception $e) {
+    //     return response()->json([
+    //         'success' => false,
+    //         'message' => '削除中にエラーが発生しました。',
+    //         'error' => $e->getMessage()
+    //     ], 500);
+    // }
+}
+    public function productSearch(Request $request)
+    {Log::info($request);
+
+
+        $search = $request->input('search', '');
+        $companyId = $request->input('company_id');
+        $priceMin = $request->input('price_min');
+        $priceMax  = $request->input('price_max');
+        
         try {
-            $product->delete();
+            $products = Product::query();
 
-            DB::commit();
+            if (!empty($search)) {
+                $products->where(function ($query) use ($search) {
+                    $query->where('product_name', 'like', '%' . $search . '%')
+                          ->orWhere('description', 'like', '%' . $search . '%');
+                });
+            }
 
-            return redirect('/products')
-            ->with('success', 'Product deleted successfully');
+            if (!empty($companyId)) {
+                $products->where('company_id', $companyId);
+            }
+
+            if (!empty($priceMax)) {
+                $query->where('price', '<=', $priceMax);
+            }
+
+            $products = $products->paginate(15);
+            $companies = Company::all(); 
+
+            return view('products.index', compact('products', 'companies'));
         } catch (\Exception $e) {
-            DB::rollback();
-            return back()->withErrors(['error' => 'An unexpected error occurred.']);
+            \Log::error('Search error: ' . $e->getMessage());
+            return redirect()->route('products.index')->with('error', '検索中にエラーが発生しました。');
         }
     }
 }
-    

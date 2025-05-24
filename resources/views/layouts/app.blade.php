@@ -15,6 +15,11 @@
 
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    @stack('scripts')
+
+    <script src="{{ asset('js/product-search.js') }}" defer></script>
 </head>
 <body>
     <div id="app">
@@ -76,5 +81,51 @@
             @yield('content')
         </main>
     </div>
+
+    @push('scripts')
+    <script>
+    $(document).ready(function() {
+        
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        $('#search-form').on('submit', function(e) {
+            e.preventDefault();
+            var formData = $(this).serialize();
+            var searchUrl = $(this).data('search-url');
+
+            $.ajax({
+                url: searchUrl,
+                type: 'GET',
+                data: formData,
+                dataType: 'html',
+                success: function(response) {
+                    if ($(response).find('.products tbody').length > 0) {
+                        $('.products tbody').html($(response).find('.products tbody').html());
+                        $('.pagination').replaceWith($(response).find('.pagination'));
+                    } else {
+                        $('.products tbody').html('<tr><td colspan="5">該当する商品がありません。</td></tr>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", error);
+                    alert("検索中にエラーが発生しました。\nステータスコード: " + xhr.status + "\nエラーメッセージ: " + error);
+                }
+            });
+        });
+
+        $('#search-button').click(function() {
+            $('#search-form').trigger('submit');
+        });
+
+        $('input[name="search"], select[name="company_id"]').change(function() {
+            $('#search-form').trigger('submit');
+        });
+    });
+    </script>
+    @endpush
 </body>
 </html>

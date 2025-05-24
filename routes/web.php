@@ -25,7 +25,10 @@ Route::get('/', function () {
 
 Auth::routes();
 
+Route::get('/search', [ProductController::class, 'productSearch'])->name('products.search');
+
 Route::group(['middleware' => 'auth'], function () {
+
     Route::get('products', [ProductController::class, 'index'])->name('products.index');
 
     Route::get('products/create', [ProductController::class, 'create'])->name('products.create');
@@ -38,9 +41,10 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
 
-    Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+    Route::post('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 });
 
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
