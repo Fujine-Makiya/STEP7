@@ -27,17 +27,4 @@ class Product extends Model{
     {
         return $this->belongsTo(Company::class);
     }
-
-    public function index(Request $request)
-    {
-    $query = Product::query();
-    
-    if($search = $request->search){
-        $query->where('product_name', 'LIKE', "%{$search}%");
-    }
-
-    $products = $query->paginate(10);
-
-    return view('products.index', ['products' => $products]);
-}
 }
