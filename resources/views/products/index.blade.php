@@ -43,12 +43,12 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th><a href="{{ route('products.index', array_merge(request()->query(), ['sort' => 'id', 'direction' => request('sort') === 'id' && request('direction') === 'asc' ? 'desc' : 'asc'])) }}">ID</a></th>
+                    <th><a class="sort-link" href="{{ route('products.index', array_merge(request()->query(), ['sort' => 'id', 'direction' => request('sort') === 'id' && request('direction') === 'asc' ? 'desc' : 'asc'])) }}">ID</a></th>
                     <th>商品画像</th>
-                    <th><a href="{{ route('products.index', array_merge(request()->query(), ['sort' => 'product_name', 'direction' => request('sort') === 'product_name' && request('direction') === 'asc' ? 'desc' : 'asc'])) }}">商品名</a></th>
-                    <th><a href="{{ route('products.index', array_merge(request()->query(), ['sort' => 'price', 'direction' => request('sort') === 'price' && request('direction') === 'asc' ? 'desc' : 'asc'])) }}">価格</a></th>
-                    <th><a href="{{ route('products.index', array_merge(request()->query(), ['sort' => 'stock', 'direction' => request('sort') === 'stock' && request('direction') === 'asc' ? 'desc' : 'asc'])) }}">在庫数</a></th>
-                    <th><a href="{{ route('products.index', array_merge(request()->query(), ['sort' => 'company_name', 'direction' => request('sort') === 'company_name' && request('direction') === 'asc' ? 'desc' : 'asc'])) }}">メーカー名</a></th>
+                    <th><a class="sort-link" href="{{ route('products.index', array_merge(request()->query(), ['sort' => 'product_name', 'direction' => request('sort') === 'product_name' && request('direction') === 'asc' ? 'desc' : 'asc'])) }}">商品名</a></th>
+                    <th><a class="sort-link" href="{{ route('products.index', array_merge(request()->query(), ['sort' => 'price', 'direction' => request('sort') === 'price' && request('direction') === 'asc' ? 'desc' : 'asc'])) }}">価格</a></th>
+                    <th><a class="sort-link" href="{{ route('products.index', array_merge(request()->query(), ['sort' => 'stock', 'direction' => request('sort') === 'stock' && request('direction') === 'asc' ? 'desc' : 'asc'])) }}">在庫数</a></th>
+                    <th><a class="sort-link" href="{{ route('products.index', array_merge(request()->query(), ['sort' => 'company_name', 'direction' => request('sort') === 'company_name' && request('direction') === 'asc' ? 'desc' : 'asc'])) }}">メーカー名</a></th>
                     <th><a href="{{ route('products.create') }}" class="btn btn-primary mb-3">商品新規登録</a></th>
                 </tr>
             </thead>
