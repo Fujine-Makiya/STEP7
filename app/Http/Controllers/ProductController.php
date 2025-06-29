@@ -155,15 +155,6 @@ class ProductController extends Controller {
     }
 
     public function destroy(Product $product){
-    // try {
-    //     $product->delete();
-    //     return response()->json(['success' => true]);
-    // } catch (\Exception $e) {
-    //     return response()->json([
-    //         'success' => false,
-    //         'message' => '削除に失敗しました: ' . $e->getMessage()
-    //     ], 500);
-    // }
     try {
         $product->delete();
 
@@ -179,13 +170,6 @@ class ProductController extends Controller {
             'error' => $e->getMessage()
         ], 500);
     }
-    // catch (\Exception $e) {
-    //     return response()->json([
-    //         'success' => false,
-    //         'message' => '削除中にエラーが発生しました。',
-    //         'error' => $e->getMessage()
-    //     ], 500);
-    // }
 }
     public function productSearch(Request $request)
     {Log::info($request);
@@ -195,29 +179,42 @@ class ProductController extends Controller {
         $companyId = $request->input('company_id');
         $priceMin = $request->input('price_min');
         $priceMax  = $request->input('price_max');
+        $stockMin = $request->input('stock_min');
+        $stockMax = $request->input('stock_max');
         
         try {
-            $products = Product::query();
-
+            $query = Product::with('company');
             if (!empty($search)) {
-                $products->where(function ($query) use ($search) {
-                    $query->where('product_name', 'like', '%' . $search . '%')
-                          ->orWhere('description', 'like', '%' . $search . '%');
-                });
-            }
+    $query->where(function ($q) use ($search) {
+        $q->where('product_name', 'like', '%' . $search . '%')
+          ->orWhere('description', 'like', '%' . $search . '%');
+    });
+}
 
             if (!empty($companyId)) {
-                $products->where('company_id', $companyId);
+                $query->where('company_id', $companyId);
             }
 
             if (!empty($priceMax)) {
                 $query->where('price', '<=', $priceMax);
             }
 
-            $products = $products->paginate(15);
-            $companies = Company::all(); 
+            if (!empty($priceMin)) {
+                $query->where('price', '>=', $priceMin);
+            }
 
-            return view('products.index', compact('products', 'companies'));
+            if (!empty($stockMax)) {
+                $query->where('stock', '<=', $stockMax);
+            }
+
+            if (!empty($stockMin)) {
+                $query->where('stock', '>=', $stockMin);
+            }
+
+            $products = $query->paginate(15);
+            Log::info($products);
+
+        return response()->json($products);
         } catch (\Exception $e) {
             \Log::error('Search error: ' . $e->getMessage());
             return redirect()->route('products.index')->with('error', '検索中にエラーが発生しました。');
